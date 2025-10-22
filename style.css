@@ -1,0 +1,233 @@
+/* VARIABLES / COLORS */
+:root {
+  --bg: #f5f5f5;      /* page background color */
+  --fg: #111;          /* text color */
+  --accent: #ffcc00;   /* yellow accent for buttons, borders */
+  --reel-bg: #fff;     /* slot machine background */
+  --win: #00ff99;      /* winning line color */
+}
+
+/* BASIC PAGE STYLING */
+body {
+  margin:0;
+  padding:0;
+  font-family:"Segoe UI", "Roboto", sans-serif; /* basic fonts */
+}
+
+.page {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+  padding:3rem 1rem;
+  background: linear-gradient(145deg, #f5f5f5, #e0e0e0); /* light gradient bg */
+  color: var(--fg);
+  transition: all 0.3s;
+  overflow-x:hidden;
+}
+
+/* hide the checkboxes */
+input[type="checkbox"] { display:none; }
+
+/* DARK MODE BUTTONS */
+.theme-buttons {
+  position:absolute;
+  top:1rem;
+  right:1rem;
+  display:flex;
+  gap:0.5rem;
+  z-index:10;
+}
+
+.theme-buttons label {
+  background: var(--accent);
+  border-radius:50%; /* make it a circle */
+  width:45px; height:45px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-size:1.6rem;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25); /* subtle shadow */
+  transition:all 0.3s;
+}
+
+/* DARK MODE STYLING */
+#theme-toggle:checked ~ .page {
+  background: linear-gradient(145deg, #111, #222); /* dark background */
+  color:#eee; /* light text */
+}
+
+#theme-toggle:checked ~ .page .machine {
+  background:#222; /* dark machine bg */
+  border-color: var(--accent); /* keep yellow border */
+}
+
+#theme-toggle:checked ~ .page .spin {
+  background: var(--accent);
+  color:#111;
+}
+
+/* PAGE TITLE */
+h1 {
+  margin-bottom:2rem;
+  font-weight:600;
+  letter-spacing:1px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  transition: color 0.3s;
+}
+
+/* LOT MACHINE STYLING
+   =============================== */
+.machine {
+  display:flex;
+  gap:1.5rem;
+  padding:2rem;
+  background: var(--reel-bg);
+  border-radius:30px;
+  border:4px solid var(--accent);
+  position:relative;
+  perspective:600px; /* for 3D-ish tilt */
+  transition: all 0.3s;
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
+}
+
+.reel {
+  width:150px;
+  height:180px;
+  overflow:hidden;
+  border-radius:25px;
+  background: linear-gradient(to bottom,#fff,#eee);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.25); /* inside shadow for depth */
+  transition:all 0.3s;
+}
+
+.symbols {
+  display:flex;
+  flex-direction:column;
+  transform: translateY(-20px) rotateX(10deg); /* starting position */
+  transition:filter 0.3s;
+}
+
+.symbols span {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:3.5em;
+  height:180px; /* make emojis big */
+  transition: transform 0.3s;
+}
+
+/* SPIN BUTTON */
+.spin {
+  margin-top:2rem;
+  background: var(--accent);
+  color:#000;
+  font-weight:bold;
+  border-radius:25px;
+  padding:1rem 3rem;
+  cursor:pointer;
+  font-size:1.5rem;
+  text-shadow:0 0 5px rgba(0,0,0,0.15);
+  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+}
+
+.spin:hover {
+  transform: scale(1.05); /* hover pop effect */
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* SPINNING ANIMATION */
+/* blur reels and spin them when button is clicked */
+#spin-toggle:checked ~ .page .machine .symbols {
+  animation: spin 2s linear forwards;
+  filter: blur(3px); /* blur while spinning */
+}
+
+/* stagger reels for realistic effect */
+#spin-toggle:checked ~ .page .machine .r2 .symbols { animation-delay:0.2s; }
+#spin-toggle:checked ~ .page .machine .r3 .symbols { animation-delay:0.4s; }
+
+/* machine glow while spinning */
+#spin-toggle:checked ~ .page .machine {
+  box-shadow:0 0 40px var(--accent),0 0 80px var(--accent),0 0 120px var(--accent);
+  transform: scale(1.03);
+  animation: glowFade 2s forwards; /* glow fades out automatically */
+}
+
+/* glow fade out */
+@keyframes glowFade {
+  0% { box-shadow:0 0 40px var(--accent),0 0 80px var(--accent),0 0 120px var(--accent); }
+  100% { box-shadow:0 0 0 #000; transform:scale(1); }
+}
+
+/* actual spin animation */
+@keyframes spin {
+  0% { transform: translateY(-20px) rotateX(10deg); filter: blur(3px); }
+  100% { transform: translateY(-1080px) rotateX(10deg); filter: blur(0); }
+}
+
+/* WIN LINE */
+.win-line {
+  position:absolute;
+  bottom:42%;
+  left:0;
+  width:100%;
+  height:8px;
+  background: var(--win);
+  border-radius:4px;
+  animation: flash 1s infinite alternate; /* flashing effect */
+  box-shadow:0 0 15px var(--win);
+}
+
+@keyframes flash {
+  from { opacity:0.3; }
+  to { opacity:1; box-shadow:0 0 25px var(--win); }
+}
+
+/* CONFETTI0*/
+.confetti {
+  position:absolute;
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+/* each confetti piece */
+.confetti span {
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  top:-10px;
+  opacity:0;
+  transition: all 0.2s;
+}
+
+/* show confetti when spinning */
+#spin-toggle:checked ~ .page .confetti span {
+  animation: fall 2s ease-in forwards;
+  opacity:1;
+}
+
+/* colors and delays for confetti pieces */
+.confetti span:nth-child(1){ left:5%; background:#ff4b5c; animation-delay:0s; }
+.confetti span:nth-child(2){ left:20%; background:#ffdd59; animation-delay:0.2s; }
+.confetti span:nth-child(3){ left:35%; background:#1dd1a1; animation-delay:0.4s; }
+.confetti span:nth-child(4){ left:55%; background:#54a0ff; animation-delay:0.6s; }
+.confetti span:nth-child(5){ left:70%; background:#f368e0; animation-delay:0.8s; }
+.confetti span:nth-child(6){ left:85%; background:#ff9f43; animation-delay:1s; }
+.confetti span:nth-child(7){ left:10%; background:#ee5253; animation-delay:1.2s; }
+.confetti span:nth-child(8){ left:30%; background:#0abde3; animation-delay:1.4s; }
+.confetti span:nth-child(9){ left:50%; background:#10ac84; animation-delay:1.6s; }
+.confetti span:nth-child(10){ left:75%; background:#341f97; animation-delay:1.8s; }
+
+/* falling animation */
+@keyframes fall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
